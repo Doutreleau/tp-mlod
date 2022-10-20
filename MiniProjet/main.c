@@ -24,13 +24,16 @@ int main(void)
    // Initialization
    //---------------------------------------------------------
    const int screenWidth = 800;
-   const int screenHeight = 450;
+   const int screenHeight = 350;
  
    InitWindow(screenWidth, screenHeight, "projet");
  
    node * current_node = create_tree();
-   char * val = current_node->value;
-   bool pause = false;
+   node * next_node = NULL;
+ 
+   bool first_event = true;
+   bool choose_left = false;
+   bool choose_right = false;
  
    SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
    //----------------------------------------------------------
@@ -40,28 +43,48 @@ int main(void)
    {
        // Update
        //-----------------------------------------------------
-       if (IsKeyPressed(KEY_SPACE)) pause = !pause;
- 
-       if (!pause)
-       {
-           DrawText(val, 190, 200, 20, LIGHTGRAY);
- 
+       if (IsKeyPressed(KEY_LEFT)) {
+           first_event = false; //pb : this will be done every time we press the key, instead of only be done once. ërhaps if I change the position of if(first_event), I can get rid of this line?
+           choose_left = true;
+           choose_right = false;
        }
-       else {
-           DrawText("Second window", 190, 200, 20, LIGHTGRAY);
+       if (IsKeyPressed(KEY_RIGHT)) {
+           first_event = false;
+           choose_left = false;
+           choose_right = true;
        }
-       //-----------------------------------------------------
- 
-       // Draw
-       //-----------------------------------------------------
-       BeginDrawing();
- 
+       if (first_event){
            ClearBackground(RAYWHITE);
-           DrawText("PRESS SPACE TO CHANGE WINDOW", 10, GetScreenHeight() - 25, 20, LIGHTGRAY);
+           DrawText(current_node->value, 190, 200, 20, LIGHTGRAY);
+       }
+      
  
+       else if (choose_left)
+       {
+           next_node = current_node->left_child;
+           if (next_node !=NULL){
+               ClearBackground(RAYWHITE);
+               DrawText(next_node->value, 190, 200, 20, LIGHTGRAY);
+               current_node = next_node;
+               choose_left = false;
+           }
+       }
  
+      
+       else if (choose_right) {
+           next_node = current_node->right_child;
+           if (next_node !=NULL){
+               ClearBackground(RAYWHITE);
+               DrawText(next_node->value, 190, 200, 20, LIGHTGRAY);
+               current_node = next_node;
+               choose_right = false;
+           }
+          
+       }
+ 
+       BeginDrawing();
+           DrawText("PRESS LEFT OR RIGHT ARROW", 10, GetScreenHeight() - 25, 20, LIGHTGRAY);
        EndDrawing();
-       //-----------------------------------------------------
    }
  
    // De-Initialization
@@ -108,9 +131,13 @@ node * create_tree()
    node *root_node = NULL;
    root_node = create_root_node(root_node, "Node A, root node");
    node * node_B = insert_left_node(root_node, "Node B, left child node of A");
-   node * node_C = insert_right_node(root_node, "Node C, right child node of A");
-  
-   node * node_D = insert_left_node(node_B, "Node D, left child node of D");
+   node * node_C = insert_right_node(root_node, "Node C, right child node of A");   
+   node * node_D = insert_left_node(node_B, "Node D, left child node of B");
+   node * node_E = insert_right_node(node_B, "Node E, left child node of B");
+   node * node_F = insert_left_node(node_D, "Node F, left child node of D");
+   node * node_G = insert_right_node(node_D, "Node G, left child node of D");
+   node * node_H = insert_left_node(node_C, "Node H, left child node of C");
+   node * node_I = insert_right_node(node_C, "Node I, left child node of C");
    return root_node;
 }
  
