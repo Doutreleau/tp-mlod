@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
+#include <time.h>
 #define NULL ((void*)0)
  
 typedef struct textEvent{
@@ -12,7 +13,8 @@ typedef struct textEvent{
 typedef struct node
 {
  struct textEvent * textAndOptions;
- struct node *first_child, *second_child, *third_child, *fourth_child;
+ int proba;
+ struct node *first_child[3], *second_child[3], *third_child[3], *fourth_child[3];
 }node ;
  
  
@@ -20,12 +22,13 @@ void displayOptions(node *node);
 void displayOption(Font font, char* option, int height);
 textEvent *new_textEvent(char* text, char* option1, char* option2, char* option3, char* option4);
 struct node *new_node(textEvent* textAndOptions);
+node *new_node_with_proba(textEvent* textAndOptions, int proba);
 void print(struct node *root_node);
 node* create_root_node(textEvent* textAndOptions);
-struct node* insert_first_child(struct node* parent_node, textEvent* child_value);
-struct node* insert_second_child(struct node* parent_node, textEvent* child_value);
-struct node* insert_third_child(struct node* parent_node, textEvent* child_value);
-struct node* insert_fourth_child(struct node* parent_node, textEvent* child_value);
+node* insert_first_child(node* parent_node, textEvent* child_value, int proba, int position);
+struct node* insert_second_child(struct node* parent_node, textEvent* child_value, int proba, int position);
+struct node* insert_third_child(struct node* parent_node, textEvent* child_value, int proba, int position);
+struct node* insert_fourth_child(struct node* parent_node, textEvent* child_value, int proba, int position);
 struct node * create_tree();
 static void DrawTextBoxed(Font font, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint);
 static void DrawTextBoxedSelectable(Font font, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint, int selectStart, int selectLength, Color selectTint, Color selectBackTint);
@@ -42,6 +45,10 @@ int main(void)
   //---------------------------------------------------------
  
   InitWindow(screenWidth, screenHeight, "projet");
+ 
+  srand(time(NULL)); //used to generate random nmbers
+ 
+ 
   node * current_node = create_tree();
   node * next_node = NULL;
   
@@ -58,16 +65,27 @@ int main(void)
  
      
  
-      if (IsKeyPressed(KEY_LEFT)) {
+      if (IsKeyPressed(KEY_LEFT)) { //first child
          
           first_event = false; //pb : this will be done every time we press the key, instead of only be done once. ërhaps if I change the position of if(first_event), I can get rid of this line?
-          next_node = current_node->first_child;
+         
+          int random_number = rand()%100;      // Returns a pseudo-random integer between 0 and 99.
+          if (random_number < (current_node->first_child[0]->proba)){
+              next_node = current_node->first_child[0];           
+          }
+          else if((random_number) < ((current_node->first_child[1]->proba)+(current_node->first_child[0]->proba))){
+              next_node = current_node->first_child[1];
+          }
+          else{
+              next_node = current_node->first_child[2];
+          }
+         
           if (next_node !=NULL){
               ClearBackground(RAYWHITE);
               DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 4, container.y + 50, container.width - 4, container.height - 50 }, 20.0f, 2.0f, wordWrap, GRAY);
               displayOptions(next_node);
               current_node = next_node;
-              if(next_node->first_child == NULL && next_node->second_child==NULL && next_node->third_child == NULL && next_node->fourth_child==NULL){
+              if(next_node->first_child[0] == NULL && next_node->first_child[1] == NULL && next_node->first_child[2] == NULL && next_node->second_child[0] == NULL && next_node->second_child[1] == NULL && next_node->second_child[2] == NULL && next_node->third_child[0] == NULL && next_node->third_child[1] == NULL && next_node->third_child[2] == NULL && next_node->fourth_child[0] == NULL && next_node->fourth_child[1] == NULL && next_node->fourth_child[2] == NULL ){
                   end_game = true;
               }
           }
@@ -77,14 +95,24 @@ int main(void)
       }
       else if (IsKeyPressed(KEY_RIGHT)) {
           first_event = false; //pb : this will be done every time we press the key, instead of only be done once. ërhaps if I change the position of if(first_event), I can get rid of this line?
-          next_node = current_node->second_child;
+         
+          int random_number = rand()%100;      // Returns a pseudo-random integer between 0 and 99.
+          if (random_number < (current_node->second_child[0]->proba)){
+              next_node = current_node->second_child[0];           
+          }
+          else if((random_number) < ((current_node->second_child[1]->proba)+(current_node->second_child[0]->proba))){
+              next_node = current_node->second_child[1];
+          }
+          else{
+              next_node = current_node->second_child[2];
+          }
           if (next_node !=NULL){
               ClearBackground(RAYWHITE);
               DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 4, container.y + 50, container.width - 4, container.height - 50 }, 20.0f, 2.0f, wordWrap, GRAY);
               displayOptions(next_node);
              
               current_node = next_node;
-              if(next_node->first_child == NULL && next_node->second_child==NULL && next_node->third_child == NULL && next_node->fourth_child==NULL){
+              if(next_node->first_child[0] == NULL && next_node->first_child[1] == NULL && next_node->first_child[2] == NULL && next_node->second_child[0] == NULL && next_node->second_child[1] == NULL && next_node->second_child[2] == NULL && next_node->third_child[0] == NULL && next_node->third_child[1] == NULL && next_node->third_child[2] == NULL && next_node->fourth_child[0] == NULL && next_node->fourth_child[1] == NULL && next_node->fourth_child[2] == NULL ){
                   end_game = true;
               }
           }
@@ -95,30 +123,52 @@ int main(void)
       }
       else if (IsKeyPressed(KEY_UP)) {
           first_event = false; //pb : this will be done every time we press the key, instead of only be done once. ërhaps if I change the position of if(first_event), I can get rid of this line?
-          next_node = current_node->third_child;
-          if (next_node !=NULL){
-              ClearBackground(RAYWHITE);
-              DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 4, container.y + 50, container.width - 4, container.height - 50 }, 20.0f, 2.0f, wordWrap, GRAY);
-              displayOptions(next_node);
-              current_node = next_node;
-              if(next_node->first_child == NULL && next_node->second_child==NULL && next_node->third_child == NULL && next_node->fourth_child==NULL){
-                  end_game = true;
-              }
-          }
-          else{
+         
+          int random_number = rand()%100;      // Returns a pseudo-random integer between 0 and 99.
+         
+          if(current_node->third_child[0] != NULL){
               DrawTextBoxed(font, "this is not a valid option", (Rectangle){ container.x + 4, container.y + 270, container.width - 4, container.height - 270 }, 20.0f, 2.0f, wordWrap, GRAY);
-          }
+           }
+           else{
+               if (random_number < (current_node->third_child[0]->proba)){
+                   next_node = current_node->third_child[0];           
+               }
+               else if((random_number) < ((current_node->third_child[1]->proba)+(current_node->third_child[0]->proba))){
+                   next_node = current_node->third_child[1];
+               }
+               else{
+                   next_node = current_node->third_child[2];
+               }
+                   ClearBackground(RAYWHITE);
+                   DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 4, container.y + 50, container.width - 4, container.height - 50 }, 20.0f, 2.0f, wordWrap, GRAY);
+                   displayOptions(next_node);
+ 
+                   current_node = next_node;
+                   if(next_node->first_child[0] == NULL && next_node->first_child[1] == NULL && next_node->first_child[2] == NULL && next_node->second_child[0] == NULL && next_node->second_child[1] == NULL && next_node->second_child[2] == NULL && next_node->third_child[0] == NULL && next_node->third_child[1] == NULL && next_node->third_child[2] == NULL && next_node->fourth_child[0] == NULL && next_node->fourth_child[1] == NULL && next_node->fourth_child[2] == NULL ){
+                       end_game = true;
+                   }
+           }  
      
       }
       else if (IsKeyPressed(KEY_DOWN)) {
           first_event = false; //pb : this will be done every time we press the key, instead of only be done once. ërhaps if I change the position of if(first_event), I can get rid of this line?
-          next_node = current_node->fourth_child;
+         
+          int random_number = rand()%100;      // Returns a pseudo-random integer between 0 and 99.
+          if (random_number < (current_node->fourth_child[0]->proba)){
+              next_node = current_node->fourth_child[0];           
+          }
+          else if((random_number) < ((current_node->fourth_child[1]->proba)+(current_node->fourth_child[0]->proba))){
+              next_node = current_node->fourth_child[1];
+          }
+          else{
+              next_node = current_node->fourth_child[2];
+          }
           if (next_node !=NULL){
               ClearBackground(RAYWHITE);
               DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 4, container.y + 50, container.width - 4, container.height - 50 }, 20.0f, 2.0f, wordWrap, GRAY);
               displayOptions(next_node);
               current_node = next_node;
-              if(next_node->first_child == NULL && next_node->second_child==NULL && next_node->third_child == NULL && next_node->fourth_child==NULL){
+              if(next_node->first_child[0] == NULL && next_node->first_child[1] == NULL && next_node->first_child[2] == NULL && next_node->second_child[0] == NULL && next_node->second_child[1] == NULL && next_node->second_child[2] == NULL && next_node->third_child[0] == NULL && next_node->third_child[1] == NULL && next_node->third_child[2] == NULL && next_node->fourth_child[0] == NULL && next_node->fourth_child[1] == NULL && next_node->fourth_child[2] == NULL ){
                   end_game = true;
               }
           }
@@ -170,6 +220,8 @@ void displayOption(Font font, char* option, int height){
  
 }
  
+ 
+ 
 textEvent *new_textEvent(char* text, char* option1, char* option2, char* option3, char* option4){
    textEvent *tmp = (struct textEvent *)malloc(sizeof(struct textEvent));
    tmp -> text = text;     
@@ -185,43 +237,65 @@ node *new_node(textEvent* textAndOptions)
 {
  node *tmp = (struct node *)malloc(sizeof(struct node));
  tmp->textAndOptions = textAndOptions;
- tmp->first_child = tmp->second_child = tmp->third_child = tmp->fourth_child = NULL;
+ //tmp->first_child = tmp->second_child = tmp->third_child = tmp->fourth_child = NULL;
+ return tmp;
+}
+ 
+node *new_node_with_proba(textEvent* textAndOptions, int proba)
+{
+ node *tmp = (struct node *)malloc(sizeof(struct node));
+ tmp->textAndOptions = textAndOptions;
+ tmp->proba = proba;
+ tmp->first_child[0] = NULL;
+ tmp->first_child[1] = NULL;
+ tmp->first_child[2] = NULL;
+ tmp->second_child[0] = NULL;
+ tmp->second_child[1] = NULL;
+ tmp->second_child[2] = NULL;
+ tmp->third_child[0] = NULL;
+ tmp->third_child[1] = NULL;
+ tmp->third_child[2] = NULL;
+ tmp->fourth_child[0] = NULL;
+ tmp->fourth_child[1] = NULL;
+ tmp->fourth_child[2] = NULL;
  return tmp;
 }
 node* create_root_node( textEvent* textAndOptions) // inserting nodes!
 {
  return new_node(textAndOptions);
 }
-node* insert_first_child(node* parent_node, textEvent* child_value) // inserting nodes!
+node* insert_first_child(node* parent_node, textEvent* child_value, int proba, int position) // inserting nodes!
 {
- parent_node->first_child = new_node(child_value);
+ parent_node->first_child[position] = new_node_with_proba(child_value, proba);
 }
-node* insert_second_child(node* parent_node, textEvent* child_value) // inserting nodes!
+node* insert_second_child(node* parent_node, textEvent* child_value, int proba, int position) // inserting nodes!
 {
- parent_node->second_child = new_node(child_value);
+ parent_node->second_child[position] = new_node_with_proba(child_value, proba);
 }
-node* insert_third_child(node* parent_node, textEvent* child_value) // inserting nodes!
+node* insert_third_child(node* parent_node, textEvent* child_value, int proba, int position) // inserting nodes!
 {
- parent_node->third_child = new_node(child_value);
+ parent_node->third_child[position] = new_node_with_proba(child_value, proba);
 }
-node* insert_fourth_child(node* parent_node, textEvent* child_value) // inserting nodes!
+node* insert_fourth_child(node* parent_node, textEvent* child_value, int proba, int position) // inserting nodes!
 {
- parent_node->fourth_child = new_node(child_value);
+ parent_node->fourth_child[position] = new_node_with_proba(child_value, proba);
 }
 node * create_tree()
 {
   node *root_node = create_root_node(new_textEvent("Node A, root node","opt1","op2","op3","op4"));
-  node * node_B = insert_first_child(root_node, new_textEvent("Node B, first child node of A", "B opt1", "B opt2", "B opt3", "B opt4"));
-  node * node_C = insert_second_child(root_node, new_textEvent("Node C, second child node of A","C opt1", NULL, NULL, NULL)); 
-  node * node_D = insert_first_child(node_B, new_textEvent("Node D, first child node of B","D opt1", NULL, NULL, NULL));
-  node * node_E = insert_second_child(node_B, new_textEvent("Node E, second child node of B",NULL, NULL, NULL, NULL));
+  //node * node_B = insert_first_child(root_node, new_textEvent("Node B, first child node of A", "B opt1", "B opt2", "B opt3", "B opt4"));
+  node * node_C = insert_second_child(root_node, new_textEvent("Node C, second child node of A","C opt1", NULL, NULL, NULL),100,0); 
+  node * node_D = insert_first_child(root_node, new_textEvent("Node D, first child node of A","D opt1", NULL, NULL, NULL), 40, 0);
+  node * node_E = insert_first_child(root_node, new_textEvent("Node E, second child node of A",NULL, NULL, NULL, NULL), 60, 1);
+  /*
   node * node_F = insert_first_child(node_D, new_textEvent("Node F, first child node of D",NULL, NULL, NULL, NULL));
   node * node_G = insert_second_child(node_D, new_textEvent("Node G, second child node of D",NULL, NULL, NULL, NULL));
   node * node_H = insert_first_child(node_C, new_textEvent("Node H, first child node of C",NULL, NULL, NULL, NULL));
   node * node_I = insert_second_child(node_C, new_textEvent("Node I, second child node of C",NULL, NULL, NULL, NULL));
-  node * node_J = insert_third_child(root_node, new_textEvent("Node J, 3rd child node of A",NULL, NULL, NULL, NULL));
-  node * node_K = insert_fourth_child(root_node, new_textEvent("Node K, 4th child node of A",NULL, NULL, NULL, NULL));
-  node * node_L = insert_first_child(node_J, new_textEvent("Node L, 1th child node of J",NULL, NULL, NULL, NULL));
+  */
+  //node * node_J = insert_third_child(root_node, new_textEvent("Node J, 3rd child node of A",NULL, NULL, NULL, NULL));
+  //node * node_K = insert_fourth_child(root_node, new_textEvent("Node K, 4th child node of A",NULL, NULL, NULL, NULL));
+  //node * node_L = insert_first_child(node_J, new_textEvent("Node L, 1th child node of J",NULL, NULL, NULL, NULL));
  
   return root_node;
 }
