@@ -46,6 +46,7 @@ int main(void)
   node * next_node = NULL;
   
   bool first_event = true;
+  bool end_game = false;
  
   Font font = GetFontDefault();
   SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
@@ -67,13 +68,11 @@ int main(void)
               displayOptions(next_node);
               current_node = next_node;
               if(next_node->first_child == NULL && next_node->second_child==NULL && next_node->third_child == NULL && next_node->fourth_child==NULL){
-                  ClearBackground(RAYWHITE);
-                  DrawTextBoxed(font, "end of the game", (Rectangle){ container.x + 4, container.y + 200, container.width - 4, container.height - 200 }, 20.0f, 2.0f, wordWrap, GRAY);
+                  end_game = true;
               }
           }
           else{
-              ClearBackground(RAYWHITE);
-              DrawTextBoxed(font, "end of the game", (Rectangle){ container.x + 4, container.y + 200, container.width - 4, container.height - 200 }, 20.0f, 2.0f, wordWrap, GRAY);
+              DrawTextBoxed(font, "this is not a valid option", (Rectangle){ container.x + 4, container.y + 270, container.width - 4, container.height - 270 }, 20.0f, 2.0f, wordWrap, GRAY);
           }
       }
       else if (IsKeyPressed(KEY_RIGHT)) {
@@ -86,13 +85,11 @@ int main(void)
              
               current_node = next_node;
               if(next_node->first_child == NULL && next_node->second_child==NULL && next_node->third_child == NULL && next_node->fourth_child==NULL){
-                  ClearBackground(RAYWHITE);
-                  DrawTextBoxed(font, "end of the game", (Rectangle){ container.x + 4, container.y + 200, container.width - 4, container.height - 200 }, 20.0f, 2.0f, wordWrap, GRAY);
+                  end_game = true;
               }
           }
           else{
-              ClearBackground(RAYWHITE);
-              DrawTextBoxed(font, "end of the game", (Rectangle){ container.x + 4, container.y + 200, container.width - 4, container.height - 200 }, 20.0f, 2.0f, wordWrap, GRAY);
+              DrawTextBoxed(font, "this is not a valid option", (Rectangle){ container.x + 4, container.y + 270, container.width - 4, container.height - 270 }, 20.0f, 2.0f, wordWrap, GRAY);
           }
      
       }
@@ -105,13 +102,11 @@ int main(void)
               displayOptions(next_node);
               current_node = next_node;
               if(next_node->first_child == NULL && next_node->second_child==NULL && next_node->third_child == NULL && next_node->fourth_child==NULL){
-                  ClearBackground(RAYWHITE);
-                  DrawTextBoxed(font, "end of the game", (Rectangle){ container.x + 4, container.y + 200, container.width - 4, container.height - 200 }, 20.0f, 2.0f, wordWrap, GRAY);
+                  end_game = true;
               }
           }
           else{
-              ClearBackground(RAYWHITE);
-              DrawTextBoxed(font, "end of the game", (Rectangle){ container.x + 4, container.y + 200, container.width - 4, container.height - 200 }, 20.0f, 2.0f, wordWrap, GRAY);
+              DrawTextBoxed(font, "this is not a valid option", (Rectangle){ container.x + 4, container.y + 270, container.width - 4, container.height - 270 }, 20.0f, 2.0f, wordWrap, GRAY);
           }
      
       }
@@ -124,13 +119,11 @@ int main(void)
               displayOptions(next_node);
               current_node = next_node;
               if(next_node->first_child == NULL && next_node->second_child==NULL && next_node->third_child == NULL && next_node->fourth_child==NULL){
-                  ClearBackground(RAYWHITE);
-                  DrawTextBoxed(font, "end of the game", (Rectangle){ container.x + 4, container.y + 200, container.width - 4, container.height - 200 }, 20.0f, 2.0f, wordWrap, GRAY);
+                  end_game = true;
               }
           }
           else{
-              ClearBackground(RAYWHITE);
-              DrawTextBoxed(font, "end of the game", (Rectangle){ container.x + 4, container.y + 200, container.width - 4, container.height - 200 }, 20.0f, 2.0f, wordWrap, GRAY);
+              DrawTextBoxed(font, "this is not a valid option", (Rectangle){ container.x + 4, container.y + 270, container.width - 4, container.height - 270 }, 20.0f, 2.0f, wordWrap, GRAY);
           }
      
       }
@@ -139,6 +132,15 @@ int main(void)
           DrawTextBoxed(font, current_node->textAndOptions->text, (Rectangle){ container.x + 4, container.y + 50, container.width - 4, container.height - 50 }, 20.0f, 2.0f, wordWrap, GRAY); 
           displayOptions(current_node);
  
+      }
+ 
+      else if(end_game){
+          DrawTextBoxed(font, "end of the game. Press the space bar to replay", (Rectangle){ container.x + 4, container.y + 200, container.width - 4, container.height - 200 }, 20.0f, 2.0f, wordWrap, GRAY);
+          if (IsKeyPressed(KEY_SPACE)){
+              current_node = create_tree();
+              first_event = true;
+              end_game = false;
+          }
       }
      
    
