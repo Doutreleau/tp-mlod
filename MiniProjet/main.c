@@ -3,36 +3,50 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include <string.h>
 #define NULL ((void*)0)
-struct node *new_node(char* value);
+ 
+typedef struct textEvent{
+   char *text, *option1, *option2, *option3, *option4;
+} textEvent;
+typedef struct node
+{
+ struct textEvent * textAndOptions;
+ struct node *first_child, *second_child, *third_child, *fourth_child;
+}node ;
+ 
+ 
+void displayOptions(node *node);
+void displayOption(Font font, char* option, int height);
+textEvent *new_textEvent(char* text, char* option1, char* option2, char* option3, char* option4);
+struct node *new_node(textEvent* textAndOptions);
 void print(struct node *root_node);
-struct node* create_root_node(struct node* node, char* value);
-struct node* insert_first_child(struct node* parent_node, char* child_value);
-struct node* insert_second_child(struct node* parent_node, char* child_value);
-struct node* insert_third_child(struct node* parent_node, char* child_value);
-struct node* insert_fourth_child(struct node* parent_node, char* child_value);
+node* create_root_node(textEvent* textAndOptions);
+struct node* insert_first_child(struct node* parent_node, textEvent* child_value);
+struct node* insert_second_child(struct node* parent_node, textEvent* child_value);
+struct node* insert_third_child(struct node* parent_node, textEvent* child_value);
+struct node* insert_fourth_child(struct node* parent_node, textEvent* child_value);
 struct node * create_tree();
 static void DrawTextBoxed(Font font, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint);
 static void DrawTextBoxedSelectable(Font font, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint, int selectStart, int selectLength, Color selectTint, Color selectBackTint);
-typedef struct node
-{
- char* value;
- struct node *first_child, *second_child, *third_child, *fourth_child;
-}node ;
+ 
+const int screenWidth = 800;
+const int screenHeight = 350;
+//used to make sure the text stays in the screen
+Rectangle container = { 25.0f, 25.0f, screenWidth , screenHeight  };
+bool wordWrap = true;
+ 
 int main(void)
 {
   // Initialization
   //---------------------------------------------------------
-  const int screenWidth = 800;
-  const int screenHeight = 350;
+ 
   InitWindow(screenWidth, screenHeight, "projet");
   node * current_node = create_tree();
   node * next_node = NULL;
   
   bool first_event = true;
-  //used to make sure the text stays in the screen
-  Rectangle container = { 25.0f, 25.0f, screenWidth , screenHeight  };
-  bool wordWrap = true;
+ 
   Font font = GetFontDefault();
   SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
   //----------------------------------------------------------
@@ -46,12 +60,11 @@ int main(void)
       if (IsKeyPressed(KEY_LEFT)) {
          
           first_event = false; //pb : this will be done every time we press the key, instead of only be done once. ërhaps if I change the position of if(first_event), I can get rid of this line?
-          ClearBackground(RAYWHITE);
-          DrawTextBoxed(font, "end of the game", (Rectangle){ container.x + 4, container.y + 200, container.width - 4, container.height - 200 }, 20.0f, 2.0f, wordWrap, GRAY);
           next_node = current_node->first_child;
           if (next_node !=NULL){
               ClearBackground(RAYWHITE);
-              DrawTextBoxed(font, next_node->value, (Rectangle){ container.x + 4, container.y + 50, container.width - 4, container.height - 50 }, 20.0f, 2.0f, wordWrap, GRAY);
+              DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 4, container.y + 50, container.width - 4, container.height - 50 }, 20.0f, 2.0f, wordWrap, GRAY);
+              displayOptions(next_node);
               current_node = next_node;
               if(next_node->first_child == NULL && next_node->second_child==NULL && next_node->third_child == NULL && next_node->fourth_child==NULL){
                   ClearBackground(RAYWHITE);
@@ -68,7 +81,9 @@ int main(void)
           next_node = current_node->second_child;
           if (next_node !=NULL){
               ClearBackground(RAYWHITE);
-              DrawTextBoxed(font, next_node->value, (Rectangle){ container.x + 4, container.y + 50, container.width - 4, container.height - 50 }, 20.0f, 2.0f, wordWrap, GRAY);
+              DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 4, container.y + 50, container.width - 4, container.height - 50 }, 20.0f, 2.0f, wordWrap, GRAY);
+              displayOptions(next_node);
+             
               current_node = next_node;
               if(next_node->first_child == NULL && next_node->second_child==NULL && next_node->third_child == NULL && next_node->fourth_child==NULL){
                   ClearBackground(RAYWHITE);
@@ -86,7 +101,8 @@ int main(void)
           next_node = current_node->third_child;
           if (next_node !=NULL){
               ClearBackground(RAYWHITE);
-              DrawTextBoxed(font, next_node->value, (Rectangle){ container.x + 4, container.y + 50, container.width - 4, container.height - 50 }, 20.0f, 2.0f, wordWrap, GRAY);
+              DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 4, container.y + 50, container.width - 4, container.height - 50 }, 20.0f, 2.0f, wordWrap, GRAY);
+              displayOptions(next_node);
               current_node = next_node;
               if(next_node->first_child == NULL && next_node->second_child==NULL && next_node->third_child == NULL && next_node->fourth_child==NULL){
                   ClearBackground(RAYWHITE);
@@ -104,7 +120,8 @@ int main(void)
           next_node = current_node->fourth_child;
           if (next_node !=NULL){
               ClearBackground(RAYWHITE);
-              DrawTextBoxed(font, next_node->value, (Rectangle){ container.x + 4, container.y + 150, container.width - 4, container.height - 150 }, 20.0f, 2.0f, wordWrap, GRAY);
+              DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 4, container.y + 50, container.width - 4, container.height - 50 }, 20.0f, 2.0f, wordWrap, GRAY);
+              displayOptions(next_node);
               current_node = next_node;
               if(next_node->first_child == NULL && next_node->second_child==NULL && next_node->third_child == NULL && next_node->fourth_child==NULL){
                   ClearBackground(RAYWHITE);
@@ -119,7 +136,9 @@ int main(void)
       }
       else if (first_event){
           ClearBackground(RAYWHITE);
-          DrawTextBoxed(font, current_node->value, (Rectangle){ container.x + 4, container.y + 50, container.width - 4, container.height - 50 }, 20.0f, 2.0f, wordWrap, GRAY);     
+          DrawTextBoxed(font, current_node->textAndOptions->text, (Rectangle){ container.x + 4, container.y + 50, container.width - 4, container.height - 50 }, 20.0f, 2.0f, wordWrap, GRAY); 
+          displayOptions(current_node);
+ 
       }
      
    
@@ -133,50 +152,78 @@ int main(void)
   //----------------------------------------------------------
   return 0;
 }
-node *new_node(char* value)
+void displayOptions(node *node){
+   Font font = GetFontDefault();
+   displayOption(font, node->textAndOptions->option1, 100);
+   displayOption(font, node->textAndOptions->option2, 150);
+   displayOption(font, node->textAndOptions->option3, 200);
+   displayOption(font, node->textAndOptions->option4, 250);
+ 
+}
+ 
+void displayOption(Font font, char* option, int height){
+   if (option !=NULL){
+       DrawTextBoxed(font, option, (Rectangle){ container.x + 4, container.y + height, container.width - 4, container.height - height }, 20.0f, 2.0f, wordWrap, GRAY);
+   }
+ 
+}
+ 
+textEvent *new_textEvent(char* text, char* option1, char* option2, char* option3, char* option4){
+   textEvent *tmp = (struct textEvent *)malloc(sizeof(struct textEvent));
+   tmp -> text = text;     
+   tmp -> option1 = option1;    
+   tmp -> option2 = option2;       
+   tmp -> option3 = option3;    
+   tmp -> option4 = option4;
+  
+   return tmp;
+}
+ 
+node *new_node(textEvent* textAndOptions)
 {
  node *tmp = (struct node *)malloc(sizeof(struct node));
- tmp->value = value;
+ tmp->textAndOptions = textAndOptions;
  tmp->first_child = tmp->second_child = tmp->third_child = tmp->fourth_child = NULL;
  return tmp;
 }
-node* create_root_node(node* node, char* value) // inserting nodes!
+node* create_root_node( textEvent* textAndOptions) // inserting nodes!
 {
- return new_node(value);
+ return new_node(textAndOptions);
 }
-node* insert_first_child(node* parent_node, char* child_value) // inserting nodes!
+node* insert_first_child(node* parent_node, textEvent* child_value) // inserting nodes!
 {
  parent_node->first_child = new_node(child_value);
 }
-node* insert_second_child(node* parent_node, char* child_value) // inserting nodes!
+node* insert_second_child(node* parent_node, textEvent* child_value) // inserting nodes!
 {
  parent_node->second_child = new_node(child_value);
 }
-node* insert_third_child(node* parent_node, char* child_value) // inserting nodes!
+node* insert_third_child(node* parent_node, textEvent* child_value) // inserting nodes!
 {
  parent_node->third_child = new_node(child_value);
 }
-node* insert_fourth_child(node* parent_node, char* child_value) // inserting nodes!
+node* insert_fourth_child(node* parent_node, textEvent* child_value) // inserting nodes!
 {
  parent_node->fourth_child = new_node(child_value);
 }
 node * create_tree()
 {
-  node *root_node = NULL;
-  root_node = create_root_node(root_node, "Node A, root node");
-  node * node_B = insert_first_child(root_node, "Node B, first child node of A");
-  node * node_C = insert_second_child(root_node, "Node C, second child node of A"); 
-  node * node_D = insert_first_child(node_B, "Node D, first child node of B");
-  node * node_E = insert_second_child(node_B, "Node E, second child node of B");
-  node * node_F = insert_first_child(node_D, "Node F, first child node of D");
-  node * node_G = insert_second_child(node_D, "Node G, second child node of D");
-  node * node_H = insert_first_child(node_C, "Node H, first child node of C");
-  node * node_I = insert_second_child(node_C, "Node I, second child node of C");
-  node * node_J = insert_third_child(root_node, "Node J, 3rd child node of A");
-  node * node_K = insert_fourth_child(root_node, "Node K, 4th child node of A");
-  node * node_L = insert_first_child(node_J, "Node L, 1th child node of J");
+  node *root_node = create_root_node(new_textEvent("Node A, root node","opt1","op2","op3","op4"));
+  node * node_B = insert_first_child(root_node, new_textEvent("Node B, first child node of A", "B opt1", "B opt2", "B opt3", "B opt4"));
+  node * node_C = insert_second_child(root_node, new_textEvent("Node C, second child node of A","C opt1", NULL, NULL, NULL)); 
+  node * node_D = insert_first_child(node_B, new_textEvent("Node D, first child node of B","D opt1", NULL, NULL, NULL));
+  node * node_E = insert_second_child(node_B, new_textEvent("Node E, second child node of B",NULL, NULL, NULL, NULL));
+  node * node_F = insert_first_child(node_D, new_textEvent("Node F, first child node of D",NULL, NULL, NULL, NULL));
+  node * node_G = insert_second_child(node_D, new_textEvent("Node G, second child node of D",NULL, NULL, NULL, NULL));
+  node * node_H = insert_first_child(node_C, new_textEvent("Node H, first child node of C",NULL, NULL, NULL, NULL));
+  node * node_I = insert_second_child(node_C, new_textEvent("Node I, second child node of C",NULL, NULL, NULL, NULL));
+  node * node_J = insert_third_child(root_node, new_textEvent("Node J, 3rd child node of A",NULL, NULL, NULL, NULL));
+  node * node_K = insert_fourth_child(root_node, new_textEvent("Node K, 4th child node of A",NULL, NULL, NULL, NULL));
+  node * node_L = insert_first_child(node_J, new_textEvent("Node L, 1th child node of J",NULL, NULL, NULL, NULL));
+ 
   return root_node;
 }
+ 
 // The next two functions were taken from the raylib example entitled "text_rectangle_bounds", by SzieberthAdam.
 // It can be found here : https://github.com/raysan5/raylib/blob/master/examples/text/text_rectangle_bounds.c
 // It is used to keeo the text inside the screen.
