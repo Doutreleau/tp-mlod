@@ -21,7 +21,6 @@ typedef struct node
 void displayOptions(node *node);
 void displayOption(Font font, char* option, int height);
 textEvent *new_textEvent(char* text, char* option1, char* option2, char* option3, char* option4);
-struct node *new_node(textEvent* textAndOptions);
 node *new_node_with_proba(textEvent* textAndOptions, int proba);
 void print(struct node *root_node);
 node* create_root_node(textEvent* textAndOptions);
@@ -70,55 +69,58 @@ int main(void)
           first_event = false; //pb : this will be done every time we press the key, instead of only be done once. ërhaps if I change the position of if(first_event), I can get rid of this line?
          
           int random_number = rand()%100;      // Returns a pseudo-random integer between 0 and 99.
-          if (random_number < (current_node->first_child[0]->proba)){
-              next_node = current_node->first_child[0];           
-          }
-          else if((random_number) < ((current_node->first_child[1]->proba)+(current_node->first_child[0]->proba))){
-              next_node = current_node->first_child[1];
-          }
-          else{
-              next_node = current_node->first_child[2];
-          }
          
-          if (next_node !=NULL){
-              ClearBackground(RAYWHITE);
-              DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 4, container.y + 50, container.width - 4, container.height - 50 }, 20.0f, 2.0f, wordWrap, GRAY);
-              displayOptions(next_node);
-              current_node = next_node;
-              if(next_node->first_child[0] == NULL && next_node->first_child[1] == NULL && next_node->first_child[2] == NULL && next_node->second_child[0] == NULL && next_node->second_child[1] == NULL && next_node->second_child[2] == NULL && next_node->third_child[0] == NULL && next_node->third_child[1] == NULL && next_node->third_child[2] == NULL && next_node->fourth_child[0] == NULL && next_node->fourth_child[1] == NULL && next_node->fourth_child[2] == NULL ){
-                  end_game = true;
-              }
-          }
-          else{
+          if(current_node->first_child[0] == NULL){
               DrawTextBoxed(font, "this is not a valid option", (Rectangle){ container.x + 4, container.y + 270, container.width - 4, container.height - 270 }, 20.0f, 2.0f, wordWrap, GRAY);
-          }
+           }
+           else{
+               if (random_number < (current_node->first_child[0]->proba)){
+                   next_node = current_node->first_child[0];           
+               }
+               else if((random_number) < ((current_node->first_child[1]->proba)+(current_node->first_child[0]->proba))){
+                   next_node = current_node->first_child[1];
+               }
+               else{
+                   next_node = current_node->first_child[2];
+               }
+                   ClearBackground(RAYWHITE);
+                   DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 4, container.y + 50, container.width - 4, container.height - 50 }, 20.0f, 2.0f, wordWrap, GRAY);
+                   displayOptions(next_node);
+ 
+                   current_node = next_node;
+                   if(next_node->first_child[0] == NULL && next_node->first_child[1] == NULL && next_node->first_child[2] == NULL && next_node->second_child[0] == NULL && next_node->second_child[1] == NULL && next_node->second_child[2] == NULL && next_node->third_child[0] == NULL && next_node->third_child[1] == NULL && next_node->third_child[2] == NULL && next_node->fourth_child[0] == NULL && next_node->fourth_child[1] == NULL && next_node->fourth_child[2] == NULL ){
+                       end_game = true;
+                   }
+           }  
+     
       }
       else if (IsKeyPressed(KEY_RIGHT)) {
           first_event = false; //pb : this will be done every time we press the key, instead of only be done once. ërhaps if I change the position of if(first_event), I can get rid of this line?
          
           int random_number = rand()%100;      // Returns a pseudo-random integer between 0 and 99.
-          if (random_number < (current_node->second_child[0]->proba)){
-              next_node = current_node->second_child[0];           
-          }
-          else if((random_number) < ((current_node->second_child[1]->proba)+(current_node->second_child[0]->proba))){
-              next_node = current_node->second_child[1];
-          }
-          else{
-              next_node = current_node->second_child[2];
-          }
-          if (next_node !=NULL){
-              ClearBackground(RAYWHITE);
-              DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 4, container.y + 50, container.width - 4, container.height - 50 }, 20.0f, 2.0f, wordWrap, GRAY);
-              displayOptions(next_node);
-             
-              current_node = next_node;
-              if(next_node->first_child[0] == NULL && next_node->first_child[1] == NULL && next_node->first_child[2] == NULL && next_node->second_child[0] == NULL && next_node->second_child[1] == NULL && next_node->second_child[2] == NULL && next_node->third_child[0] == NULL && next_node->third_child[1] == NULL && next_node->third_child[2] == NULL && next_node->fourth_child[0] == NULL && next_node->fourth_child[1] == NULL && next_node->fourth_child[2] == NULL ){
-                  end_game = true;
-              }
-          }
-          else{
+         
+          if(current_node->second_child[0] == NULL){
               DrawTextBoxed(font, "this is not a valid option", (Rectangle){ container.x + 4, container.y + 270, container.width - 4, container.height - 270 }, 20.0f, 2.0f, wordWrap, GRAY);
-          }
+           }
+           else{
+               if (random_number < (current_node->second_child[0]->proba)){
+                   next_node = current_node->second_child[0];           
+               }
+               else if((random_number) < ((current_node->second_child[1]->proba)+(current_node->second_child[0]->proba))){
+                   next_node = current_node->second_child[1];
+               }
+               else{
+                   next_node = current_node->second_child[2];
+               }
+                   ClearBackground(RAYWHITE);
+                   DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 4, container.y + 50, container.width - 4, container.height - 50 }, 20.0f, 2.0f, wordWrap, GRAY);
+                   displayOptions(next_node);
+ 
+                   current_node = next_node;
+                   if(next_node->first_child[0] == NULL && next_node->first_child[1] == NULL && next_node->first_child[2] == NULL && next_node->second_child[0] == NULL && next_node->second_child[1] == NULL && next_node->second_child[2] == NULL && next_node->third_child[0] == NULL && next_node->third_child[1] == NULL && next_node->third_child[2] == NULL && next_node->fourth_child[0] == NULL && next_node->fourth_child[1] == NULL && next_node->fourth_child[2] == NULL ){
+                       end_game = true;
+                   }
+           }  
      
       }
       else if (IsKeyPressed(KEY_UP)) {
@@ -126,7 +128,7 @@ int main(void)
          
           int random_number = rand()%100;      // Returns a pseudo-random integer between 0 and 99.
          
-          if(current_node->third_child[0] != NULL){
+          if(current_node->third_child[0] == NULL){
               DrawTextBoxed(font, "this is not a valid option", (Rectangle){ container.x + 4, container.y + 270, container.width - 4, container.height - 270 }, 20.0f, 2.0f, wordWrap, GRAY);
            }
            else{
@@ -154,29 +156,31 @@ int main(void)
           first_event = false; //pb : this will be done every time we press the key, instead of only be done once. ërhaps if I change the position of if(first_event), I can get rid of this line?
          
           int random_number = rand()%100;      // Returns a pseudo-random integer between 0 and 99.
-          if (random_number < (current_node->fourth_child[0]->proba)){
-              next_node = current_node->fourth_child[0];           
-          }
-          else if((random_number) < ((current_node->fourth_child[1]->proba)+(current_node->fourth_child[0]->proba))){
-              next_node = current_node->fourth_child[1];
-          }
-          else{
-              next_node = current_node->fourth_child[2];
-          }
-          if (next_node !=NULL){
-              ClearBackground(RAYWHITE);
-              DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 4, container.y + 50, container.width - 4, container.height - 50 }, 20.0f, 2.0f, wordWrap, GRAY);
-              displayOptions(next_node);
-              current_node = next_node;
-              if(next_node->first_child[0] == NULL && next_node->first_child[1] == NULL && next_node->first_child[2] == NULL && next_node->second_child[0] == NULL && next_node->second_child[1] == NULL && next_node->second_child[2] == NULL && next_node->third_child[0] == NULL && next_node->third_child[1] == NULL && next_node->third_child[2] == NULL && next_node->fourth_child[0] == NULL && next_node->fourth_child[1] == NULL && next_node->fourth_child[2] == NULL ){
-                  end_game = true;
-              }
-          }
-          else{
+         
+          if(current_node->fourth_child[0] == NULL){
               DrawTextBoxed(font, "this is not a valid option", (Rectangle){ container.x + 4, container.y + 270, container.width - 4, container.height - 270 }, 20.0f, 2.0f, wordWrap, GRAY);
-          }
-     
+           }
+           else{
+               if (random_number < (current_node->fourth_child[0]->proba)){
+                   next_node = current_node->fourth_child[0];           
+               }
+               else if((random_number) < ((current_node->fourth_child[1]->proba)+(current_node->fourth_child[0]->proba))){
+                   next_node = current_node->fourth_child[1];
+               }
+               else{
+                   next_node = current_node->fourth_child[2];
+               }
+                   ClearBackground(RAYWHITE);
+                   DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 4, container.y + 50, container.width - 4, container.height - 50 }, 20.0f, 2.0f, wordWrap, GRAY);
+                   displayOptions(next_node);
+ 
+                   current_node = next_node;
+                   if(next_node->first_child[0] == NULL && next_node->first_child[1] == NULL && next_node->first_child[2] == NULL && next_node->second_child[0] == NULL && next_node->second_child[1] == NULL && next_node->second_child[2] == NULL && next_node->third_child[0] == NULL && next_node->third_child[1] == NULL && next_node->third_child[2] == NULL && next_node->fourth_child[0] == NULL && next_node->fourth_child[1] == NULL && next_node->fourth_child[2] == NULL ){
+                       end_game = true;
+                   }
+           }         
       }
+ 
       else if (first_event){
           ClearBackground(RAYWHITE);
           DrawTextBoxed(font, current_node->textAndOptions->text, (Rectangle){ container.x + 4, container.y + 50, container.width - 4, container.height - 50 }, 20.0f, 2.0f, wordWrap, GRAY); 
@@ -233,13 +237,6 @@ textEvent *new_textEvent(char* text, char* option1, char* option2, char* option3
    return tmp;
 }
  
-node *new_node(textEvent* textAndOptions)
-{
- node *tmp = (struct node *)malloc(sizeof(struct node));
- tmp->textAndOptions = textAndOptions;
- //tmp->first_child = tmp->second_child = tmp->third_child = tmp->fourth_child = NULL;
- return tmp;
-}
  
 node *new_node_with_proba(textEvent* textAndOptions, int proba)
 {
@@ -262,7 +259,7 @@ node *new_node_with_proba(textEvent* textAndOptions, int proba)
 }
 node* create_root_node( textEvent* textAndOptions) // inserting nodes!
 {
- return new_node(textAndOptions);
+ return new_node_with_proba(textAndOptions, 100);
 }
 node* insert_first_child(node* parent_node, textEvent* child_value, int proba, int position) // inserting nodes!
 {
