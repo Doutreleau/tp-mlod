@@ -1,4 +1,3 @@
-
 #include "raylib.h"
 #include <stdbool.h>
 #include <stdio.h>
@@ -7,6 +6,8 @@
 #include <string.h>
 #include <time.h>
 #define NULL ((void*)0)
+#define customColor_lightBrown  (Color){ 211, 176, 148, 255 }
+#define customColor_darkBrown  (Color){ 189, 152, 123, 255 }
  
 typedef struct textEvent{
    char *text, *option1, *option2, *option3, *option4;
@@ -88,7 +89,7 @@ int main(void)
           int random_number = rand()%100;      // Returns a pseudo-random integer between 0 and 99.
          
           if(current_node->first_child[0] == NULL){
-              DrawTextBoxed(font, "this is not a valid option", (Rectangle){ container.x + 4, container.y + 270, container.width - 4, container.height - 270 }, 20.0f, 2.0f, wordWrap, GRAY);
+              DrawTextBoxed(font, "this is not a valid option", (Rectangle){ container.x + 40, container.y + 270, container.width - 40, container.height - 270 }, 20.0f, 2.0f, wordWrap, customColor_darkBrown);
            }
            else{
                if (random_number < (current_node->first_child[0]->proba)){
@@ -102,7 +103,7 @@ int main(void)
                }
                    ClearBackground(RAYWHITE);
                    drawBackground(font,background_texture);
-                   DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 4, container.y + 50, container.width - 4, container.height - 50 }, 20.0f, 2.0f, wordWrap, GRAY);
+                   DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 40, container.y + 50, container.width - 40, container.height - 50 }, 20.0f, 2.0f, wordWrap, customColor_darkBrown);
                    displayOptions(next_node);
  
                    current_node = next_node;
@@ -118,7 +119,7 @@ int main(void)
           int random_number = rand()%100;      // Returns a pseudo-random integer between 0 and 99.
          
           if(current_node->second_child[0] == NULL){
-              DrawTextBoxed(font, "this is not a valid option", (Rectangle){ container.x + 4, container.y + 270, container.width - 4, container.height - 270 }, 20.0f, 2.0f, wordWrap, GRAY);
+              DrawTextBoxed(font, "this is not a valid option", (Rectangle){ container.x + 40, container.y + 270, container.width - 40, container.height - 270 }, 20.0f, 2.0f, wordWrap, customColor_darkBrown);
            }
            else{
                if (random_number < (current_node->second_child[0]->proba)){
@@ -132,7 +133,7 @@ int main(void)
                }
                    ClearBackground(RAYWHITE);
                    drawBackground(font,background_texture);
-                   DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 4, container.y + 50, container.width - 4, container.height - 50 }, 20.0f, 2.0f, wordWrap, GRAY);
+                   DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 40, container.y + 50, container.width - 40, container.height - 50 }, 20.0f, 2.0f, wordWrap, customColor_darkBrown);
                    displayOptions(next_node);
  
                    current_node = next_node;
@@ -148,7 +149,7 @@ int main(void)
           int random_number = rand()%100;      // Returns a pseudo-random integer between 0 and 99.
          
           if(current_node->third_child[0] == NULL){
-              DrawTextBoxed(font, "this is not a valid option", (Rectangle){ container.x + 4, container.y + 270, container.width - 4, container.height - 270 }, 20.0f, 2.0f, wordWrap, GRAY);
+              DrawTextBoxed(font, "this is not a valid option", (Rectangle){ container.x + 40, container.y + 270, container.width - 40, container.height - 270 }, 20.0f, 2.0f, wordWrap, customColor_darkBrown);
            }
            else{
                if (random_number < (current_node->third_child[0]->proba)){
@@ -162,7 +163,7 @@ int main(void)
                }
                    ClearBackground(RAYWHITE);
                    drawBackground(font,background_texture);
-                   DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 4, container.y + 50, container.width - 4, container.height - 50 }, 20.0f, 2.0f, wordWrap, GRAY);
+                   DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 40, container.y + 50, container.width - 40, container.height - 50 }, 20.0f, 2.0f, wordWrap, customColor_darkBrown);
                    displayOptions(next_node);
  
                    current_node = next_node;
@@ -178,7 +179,7 @@ int main(void)
           int random_number = rand()%100;      // Returns a pseudo-random integer between 0 and 99.
          
           if(current_node->fourth_child[0] == NULL){
-              DrawTextBoxed(font, "this is not a valid option", (Rectangle){ container.x + 4, container.y + 270, container.width - 4, container.height - 270 }, 20.0f, 2.0f, wordWrap, GRAY);
+              DrawTextBoxed(font, "this is not a valid option", (Rectangle){ container.x + 40, container.y + 270, container.width - 40, container.height - 270 }, 20.0f, 2.0f, wordWrap, customColor_darkBrown);
            }
            else{
                if (random_number < (current_node->fourth_child[0]->proba)){
@@ -192,7 +193,7 @@ int main(void)
                }
                    ClearBackground(RAYWHITE);
                    drawBackground(font,background_texture);
-                   DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 4, container.y + 50, container.width - 4, container.height - 50 }, 20.0f, 2.0f, wordWrap, GRAY);
+                   DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 40, container.y + 50, container.width - 40, container.height - 50 }, 20.0f, 2.0f, wordWrap, customColor_darkBrown);
                    displayOptions(next_node);
  
                    current_node = next_node;
@@ -205,13 +206,13 @@ int main(void)
       else if (first_event){
           ClearBackground(RAYWHITE);
           drawBackground(font,background_texture);
-          DrawTextBoxed(font, current_node->textAndOptions->text, (Rectangle){ container.x + 4, container.y + 50, container.width - 4, container.height - 50 }, 20.0f, 2.0f, wordWrap, GRAY); 
+          DrawTextBoxed(font, current_node->textAndOptions->text, (Rectangle){ container.x + 40, container.y + 50, container.width - 40, container.height - 50 }, 20.0f, 2.0f, wordWrap, customColor_darkBrown); 
           displayOptions(current_node);
  
       }
  
       else if(end_game){
-          DrawTextBoxed(font, "end of the game. Press the space bar to replay", (Rectangle){ container.x + 4, container.y + 200, container.width - 4, container.height - 200 }, 20.0f, 2.0f, wordWrap, GRAY);
+          DrawTextBoxed(font, "end of the game. Press the space bar to replay", (Rectangle){ container.x + 40, container.y + 200, container.width - 40, container.height - 200 }, 20.0f, 2.0f, wordWrap, customColor_darkBrown);
           if (IsKeyPressed(KEY_SPACE)){
               current_node = create_tree();
               welcome_page = true;
@@ -243,7 +244,7 @@ int main(void)
  
 void drawBackground(Font font, Texture background_texture){
    DrawTexture(background_texture, 0, 0, WHITE);
-   DrawTextBoxed(font, "press an arrow to play", (Rectangle){ container.x + 4, container.y + 290, container.width - 4, container.height - 290 }, 20.0f, 2.0f, wordWrap, LIGHTGRAY);
+   DrawTextBoxed(font, "press an arrow to play", (Rectangle){ container.x + 40, container.y + 290, container.width - 40, container.height - 290 }, 20.0f, 2.0f, wordWrap, customColor_darkBrown);
   
 }
 void displayOptions(node *node){
@@ -257,7 +258,7 @@ void displayOptions(node *node){
  
 void displayOption(Font font, char* option, int height){
    if (option !=NULL){
-       DrawTextBoxed(font, option, (Rectangle){ container.x + 4, container.y + height, container.width - 4, container.height - height }, 20.0f, 2.0f, wordWrap, GRAY);
+       DrawTextBoxed(font, option, (Rectangle){ container.x + 40, container.y + height, container.width - 40, container.height - height }, 20.0f, 2.0f, wordWrap, customColor_lightBrown);
    }
  
 }
