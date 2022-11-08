@@ -9,16 +9,20 @@
 #define customColor_lightBrown  (Color){ 211, 176, 148, 255 }
 #define customColor_darkBrown  (Color){ 189, 152, 123, 255 }
  
+//the text shown on the screen is made of 5 different texts : the text of the event, and the text of the different options. Those two types of texts were split in a struct in order to make it easier to display.
 typedef struct textEvent{
    char *text, *option1, *option2, *option3, *option4;
 } textEvent;
+ 
 typedef struct node
 {
  struct textEvent * textAndOptions;
  int proba;
- struct node *first_child[3], *second_child[3], *third_child[3], *fourth_child[3];
+ struct node *first_child[3], *second_child[3], *third_child[3], *fourth_child[3]; //a node has up to 4 options, and each option can have up to 3 children, the elected child will be chosen randomly
 }node ;
  
+ 
+//defining all the functions
 void drawBackground(Font font, Texture background_texture);
 void displayOptions(node *node);
 void displayOption(Font font, char* option, int height);
@@ -30,16 +34,16 @@ node* insert_first_child(node* parent_node, textEvent* child_value, int proba, i
 struct node* insert_second_child(struct node* parent_node, textEvent* child_value, int proba, int position);
 struct node* insert_third_child(struct node* parent_node, textEvent* child_value, int proba, int position);
 struct node* insert_fourth_child(struct node* parent_node, textEvent* child_value, int proba, int position);
-struct node * create_tree();
+struct node * create_tree(node*root_node);
+void destroyTree(node * root_node);
  
 void initialiseNode(node *node);
-char* scanLine();
-int scanLineAsInt();
 static void DrawTextBoxed(Font font, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint);
 static void DrawTextBoxedSelectable(Font font, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint, int selectStart, int selectLength, Color selectTint, Color selectBackTint);
  
 const int screenWidth = 711;
 const int screenHeight = 400;
+ 
 //used to make sure the text stays in the screen
 Rectangle container = { 25.0f, 25.0f, screenWidth , screenHeight  };
 bool wordWrap = true;
@@ -66,12 +70,14 @@ int main(void)
    Texture2D background_texture = LoadTextureFromImage(background_image);          // Image converted to texture, GPU memory (VRAM)
    UnloadImage(background_image);   // Once image has been converted to texture and uploaded to VRAM, it can be unloaded from RAM
  
-  node * current_node = create_tree();
+   // generate the tree
+   node *root_node = create_root_node(new_textEvent("Node A, root node","opt1","op2","op3","op4")); // we need to generate the root node separately in order to easily retrieve it when we free the allocated memory
+  node * current_node = create_tree(root_node);
   node * next_node = NULL;
  
-  bool welcome_page = true;
-  bool first_event = false;
-  bool end_game = false;
+  bool welcome_page = true; //boolean to know whether to display the welcoming page or not.
+  bool first_event = false; //boolean to know whether to display the first event or not.
+  bool end_game = false; //boolean to know whether to display the text of the end of the game.
  
   Font font = GetFontDefault();
   SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
@@ -82,16 +88,16 @@ int main(void)
       // Update
  
  
-      if (IsKeyPressed(KEY_LEFT)) { //first child
+      if (IsKeyPressed(KEY_LEFT)&(!welcome_page)) { //first child
          
-          first_event = false; //pb : this will be done every time we press the key, instead of only be done once. ërhaps if I change the position of if(first_event), I can get rid of this line?
+          first_event = false;
          
-          int random_number = rand()%100;      // Returns a pseudo-random integer between 0 and 99.
-         
-          if(current_node->first_child[0] == NULL){
+          if(current_node->first_child[0] == NULL){ //if the user pressed the key, but that there is no option for that key (ie the user made a mistake)
               DrawTextBoxed(font, "this is not a valid option", (Rectangle){ container.x + 40, container.y + 270, container.width - 40, container.height - 270 }, 20.0f, 2.0f, wordWrap, customColor_darkBrown);
            }
            else{
+               int random_number = rand()%100;      // Returns a pseudo-random integer between 0 and 99.
+               //we determine the next event, based on the random number
                if (random_number < (current_node->first_child[0]->proba)){
                    next_node = current_node->first_child[0];           
                }
@@ -101,21 +107,21 @@ int main(void)
                else{
                    next_node = current_node->first_child[2];
                }
-                   ClearBackground(RAYWHITE);
-                   drawBackground(font,background_texture);
-                   DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 40, container.y + 50, container.width - 40, container.height - 50 }, 20.0f, 2.0f, wordWrap, customColor_darkBrown);
-                   displayOptions(next_node);
+               //display the background, the text and the options
+               ClearBackground(RAYWHITE);
+               drawBackground(font,background_texture);
+               DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 40, container.y + 50, container.width - 40, container.height - 50 }, 20.0f, 2.0f, wordWrap, customColor_darkBrown);
+               displayOptions(next_node);
  
-                   current_node = next_node;
-                   if(next_node->first_child[0] == NULL && next_node->first_child[1] == NULL && next_node->first_child[2] == NULL && next_node->second_child[0] == NULL && next_node->second_child[1] == NULL && next_node->second_child[2] == NULL && next_node->third_child[0] == NULL && next_node->third_child[1] == NULL && next_node->third_child[2] == NULL && next_node->fourth_child[0] == NULL && next_node->fourth_child[1] == NULL && next_node->fourth_child[2] == NULL ){
-                       end_game = true;
-                   }
+               current_node = next_node;
+               if(next_node->first_child[0] == NULL && next_node->first_child[1] == NULL && next_node->first_child[2] == NULL && next_node->second_child[0] == NULL && next_node->second_child[1] == NULL && next_node->second_child[2] == NULL && next_node->third_child[0] == NULL && next_node->third_child[1] == NULL && next_node->third_child[2] == NULL && next_node->fourth_child[0] == NULL && next_node->fourth_child[1] == NULL && next_node->fourth_child[2] == NULL ){
+                   end_game = true;//if the next node has no children, it is the end of the game
+               }
            }  
      
       }
-      else if (IsKeyPressed(KEY_RIGHT)) {
-          first_event = false; //pb : this will be done every time we press the key, instead of only be done once. ërhaps if I change the position of if(first_event), I can get rid of this line?
-         
+      else if (IsKeyPressed(KEY_RIGHT)&(!welcome_page)) {
+          first_event = false;
           int random_number = rand()%100;      // Returns a pseudo-random integer between 0 and 99.
          
           if(current_node->second_child[0] == NULL){
@@ -131,21 +137,20 @@ int main(void)
                else{
                    next_node = current_node->second_child[2];
                }
-                   ClearBackground(RAYWHITE);
-                   drawBackground(font,background_texture);
-                   DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 40, container.y + 50, container.width - 40, container.height - 50 }, 20.0f, 2.0f, wordWrap, customColor_darkBrown);
-                   displayOptions(next_node);
+               ClearBackground(RAYWHITE);
+               drawBackground(font,background_texture);
+               DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 40, container.y + 50, container.width - 40, container.height - 50 }, 20.0f, 2.0f, wordWrap, customColor_darkBrown);
+               displayOptions(next_node);
  
-                   current_node = next_node;
-                   if(next_node->first_child[0] == NULL && next_node->first_child[1] == NULL && next_node->first_child[2] == NULL && next_node->second_child[0] == NULL && next_node->second_child[1] == NULL && next_node->second_child[2] == NULL && next_node->third_child[0] == NULL && next_node->third_child[1] == NULL && next_node->third_child[2] == NULL && next_node->fourth_child[0] == NULL && next_node->fourth_child[1] == NULL && next_node->fourth_child[2] == NULL ){
-                       end_game = true;
-                   }
+               current_node = next_node;
+               if(next_node->first_child[0] == NULL && next_node->first_child[1] == NULL && next_node->first_child[2] == NULL && next_node->second_child[0] == NULL && next_node->second_child[1] == NULL && next_node->second_child[2] == NULL && next_node->third_child[0] == NULL && next_node->third_child[1] == NULL && next_node->third_child[2] == NULL && next_node->fourth_child[0] == NULL && next_node->fourth_child[1] == NULL && next_node->fourth_child[2] == NULL ){
+                   end_game = true;
+               }
            }  
      
       }
-      else if (IsKeyPressed(KEY_UP)) {
-          first_event = false; //pb : this will be done every time we press the key, instead of only be done once. ërhaps if I change the position of if(first_event), I can get rid of this line?
-         
+      else if (IsKeyPressed(KEY_UP)&(!welcome_page)) {
+          first_event = false;
           int random_number = rand()%100;      // Returns a pseudo-random integer between 0 and 99.
          
           if(current_node->third_child[0] == NULL){
@@ -161,21 +166,20 @@ int main(void)
                else{
                    next_node = current_node->third_child[2];
                }
-                   ClearBackground(RAYWHITE);
-                   drawBackground(font,background_texture);
-                   DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 40, container.y + 50, container.width - 40, container.height - 50 }, 20.0f, 2.0f, wordWrap, customColor_darkBrown);
-                   displayOptions(next_node);
+               ClearBackground(RAYWHITE);
+               drawBackground(font,background_texture);
+               DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 40, container.y + 50, container.width - 40, container.height - 50 }, 20.0f, 2.0f, wordWrap, customColor_darkBrown);
+               displayOptions(next_node);
  
-                   current_node = next_node;
-                   if(next_node->first_child[0] == NULL && next_node->first_child[1] == NULL && next_node->first_child[2] == NULL && next_node->second_child[0] == NULL && next_node->second_child[1] == NULL && next_node->second_child[2] == NULL && next_node->third_child[0] == NULL && next_node->third_child[1] == NULL && next_node->third_child[2] == NULL && next_node->fourth_child[0] == NULL && next_node->fourth_child[1] == NULL && next_node->fourth_child[2] == NULL ){
-                       end_game = true;
-                   }
+               current_node = next_node;
+               if(next_node->first_child[0] == NULL && next_node->first_child[1] == NULL && next_node->first_child[2] == NULL && next_node->second_child[0] == NULL && next_node->second_child[1] == NULL && next_node->second_child[2] == NULL && next_node->third_child[0] == NULL && next_node->third_child[1] == NULL && next_node->third_child[2] == NULL && next_node->fourth_child[0] == NULL && next_node->fourth_child[1] == NULL && next_node->fourth_child[2] == NULL ){
+                   end_game = true;
+               }
            }  
      
       }
-      else if (IsKeyPressed(KEY_DOWN)) {
-          first_event = false; //pb : this will be done every time we press the key, instead of only be done once. ërhaps if I change the position of if(first_event), I can get rid of this line?
-         
+      else if (IsKeyPressed(KEY_DOWN)&(!welcome_page)) {
+          first_event = false;
           int random_number = rand()%100;      // Returns a pseudo-random integer between 0 and 99.
          
           if(current_node->fourth_child[0] == NULL){
@@ -191,19 +195,20 @@ int main(void)
                else{
                    next_node = current_node->fourth_child[2];
                }
-                   ClearBackground(RAYWHITE);
-                   drawBackground(font,background_texture);
-                   DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 40, container.y + 50, container.width - 40, container.height - 50 }, 20.0f, 2.0f, wordWrap, customColor_darkBrown);
-                   displayOptions(next_node);
+               ClearBackground(RAYWHITE);
+               drawBackground(font,background_texture);
+               DrawTextBoxed(font, next_node->textAndOptions->text, (Rectangle){ container.x + 40, container.y + 50, container.width - 40, container.height - 50 }, 20.0f, 2.0f, wordWrap, customColor_darkBrown);
+               displayOptions(next_node);
  
-                   current_node = next_node;
-                   if(next_node->first_child[0] == NULL && next_node->first_child[1] == NULL && next_node->first_child[2] == NULL && next_node->second_child[0] == NULL && next_node->second_child[1] == NULL && next_node->second_child[2] == NULL && next_node->third_child[0] == NULL && next_node->third_child[1] == NULL && next_node->third_child[2] == NULL && next_node->fourth_child[0] == NULL && next_node->fourth_child[1] == NULL && next_node->fourth_child[2] == NULL ){
-                       end_game = true;
-                   }
+               current_node = next_node;
+               if(next_node->first_child[0] == NULL && next_node->first_child[1] == NULL && next_node->first_child[2] == NULL && next_node->second_child[0] == NULL && next_node->second_child[1] == NULL && next_node->second_child[2] == NULL && next_node->third_child[0] == NULL && next_node->third_child[1] == NULL && next_node->third_child[2] == NULL && next_node->fourth_child[0] == NULL && next_node->fourth_child[1] == NULL && next_node->fourth_child[2] == NULL ){
+                   end_game = true;
+               }
            }         
       }
  
       else if (first_event){
+          //display the first event, and its options
           ClearBackground(RAYWHITE);
           drawBackground(font,background_texture);
           DrawTextBoxed(font, current_node->textAndOptions->text, (Rectangle){ container.x + 40, container.y + 50, container.width - 40, container.height - 50 }, 20.0f, 2.0f, wordWrap, customColor_darkBrown); 
@@ -213,8 +218,9 @@ int main(void)
  
       else if(end_game){
           DrawTextBoxed(font, "end of the game. Press the space bar to replay", (Rectangle){ container.x + 40, container.y + 200, container.width - 40, container.height - 200 }, 20.0f, 2.0f, wordWrap, customColor_darkBrown);
-          if (IsKeyPressed(KEY_SPACE)){
-              current_node = create_tree();
+         
+          if (IsKeyPressed(KEY_SPACE)){  //restarting the game:
+              current_node = create_tree(root_node);
               welcome_page = true;
               end_game = false;
           }
@@ -222,26 +228,26 @@ int main(void)
  
       else if(welcome_page){
           DrawTexture(welcome_page_texture, 0, 0, WHITE);
-           if (IsKeyPressed(KEY_SPACE)){
+           if (IsKeyPressed(KEY_SPACE)){ //starting the game
               first_event = true;
               welcome_page = false;
           }
       }
-     
-   
      
  
        BeginDrawing();
        EndDrawing();
   }
   // De-Initialization
-  //---------------------------------------------------------
-  CloseWindow();        // Close window and OpenGL context
-  //----------------------------------------------------------
+ 
+  destroyTree(root_node);
+ 
+  CloseWindow();
+ 
   return 0;
 }
  
- 
+  
 void drawBackground(Font font, Texture background_texture){
    DrawTexture(background_texture, 0, 0, WHITE);
    DrawTextBoxed(font, "press an arrow to play", (Rectangle){ container.x + 40, container.y + 290, container.width - 40, container.height - 290 }, 20.0f, 2.0f, wordWrap, customColor_darkBrown);
@@ -263,7 +269,9 @@ void displayOption(Font font, char* option, int height){
  
 }
  
- 
+/*
+The next functions are used to manage the tree
+*/
  
 textEvent *new_textEvent(char* text, char* option1, char* option2, char* option3, char* option4){
    textEvent *tmp = (struct textEvent *)malloc(sizeof(struct textEvent));
@@ -316,10 +324,8 @@ node* insert_fourth_child(node* parent_node, textEvent* child_value, int proba, 
 {
  parent_node->fourth_child[position] = new_node_with_proba(child_value, proba);
 }
-node * create_tree()
+node * create_tree(node *root_node)
 {
-  node *root_node = create_root_node(new_textEvent("Node A, root node","opt1","op2","op3","op4"));
- 
   node * node_B = insert_first_child(root_node, new_textEvent("Node B, first child node of A", "B opt1", "B opt2", "B opt3", "B opt4"), 40, 0);
   node * node_C = insert_first_child(root_node, new_textEvent("Node C, second child node of A","C opt1", NULL, NULL, NULL),60,1); 
   node * node_D = insert_second_child(root_node, new_textEvent("Node D, first child node of A","D opt1", NULL, NULL, NULL), 100, 0);
@@ -342,37 +348,31 @@ node * create_tree()
   return root_node;
 }
  
+void destroyTree(node * node){
+   if (node==NULL) return;
+   destroyTree(node->first_child[0]);
+   destroyTree(node->first_child[1]);
+   destroyTree(node->first_child[2]);
+   destroyTree(node->second_child[0]);
+   destroyTree(node->second_child[1]);
+   destroyTree(node->second_child[2]);
+   destroyTree(node->third_child[0]);
+   destroyTree(node->third_child[1]);
+   destroyTree(node->third_child[2]);
+   destroyTree(node->fourth_child[0]);
+   destroyTree(node->fourth_child[1]);
+   destroyTree(node->fourth_child[2]);
+ 
+   free(node->textAndOptions);
+   free(node);
+}
+ 
  
   
  
-/* This function scans a line of text (until \n) and returns a char* that contains all characters on the line (up to 255) excluding \n.
-It also ensures the \0 termination.
-**WARNING**: The result of this function has been allocated (calloc) by the function */
-char* scanLine()
-{
-  int maxLineSize = 255;
-  char c, *line = calloc(maxLineSize+1,sizeof(char));
-  scanf("%250[^\n]", line);
-  if ( (c = getchar()) != '\n') {
-      /* we did not get all the line */
-      line[250] = '[';
-      line[251] = line[252] = line[253] = '.';
-      line[254] = ']';
-      // line[255] = '\0'; // useless because already initialized by calloc
-      // let's skip all chars untli the end of line
-      while (( (c = getchar()) != '\n') && c != EOF) ;
-  }
-  return line;
-}
-/* This function scans a line of text (until \n), converts it as an integer and returns this integer */
-int scanLineAsInt() {
-  int buf;
-  scanf("%i\n",&buf);
-  return buf;
-}
 // The next two functions were taken from the raylib example entitled "text_rectangle_bounds", by SzieberthAdam.
 // It can be found here : https://github.com/raysan5/raylib/blob/master/examples/text/text_rectangle_bounds.c
-// It is used to keeo the text inside the screen.
+// It is used to keep the text inside the screen.
 // Draw text using font inside rectangle limits
 static void DrawTextBoxed(Font font, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint)
 {
