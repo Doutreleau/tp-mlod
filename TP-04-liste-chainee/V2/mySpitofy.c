@@ -1,0 +1,405 @@
+//#include "linkedListOfMusic.h"
+//#include "linkedListOfMusic.c"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+#include <errno.h>
+
+#define nbSongs 2702
+#define maxChar 200
+
+typedef struct Music {
+	char * name;
+	char * artist;
+	char * album;
+	char * genre;
+	int disc_Number;
+	int track_Number;
+	int year;
+}Music;
+
+
+struct cellule_s {
+	Music *val;
+	struct cellule_s* suiv;
+};
+
+typedef struct cellule_s Cellule;
+
+typedef Cellule* Liste;
+void afficheList2(Liste l);
+void afficheMusic2(Music * m);
+Music * initialiseMusic(char row[], FILE* f );
+
+
+// retourne vrai si l est vide et faux sinon
+bool estVide(Liste l);
+
+// créer une liste d'un seul élément contenant la valeur v
+Liste creer(Music * v);
+
+// ajoute l'élément v en tete de la liste l
+Liste ajoutTete(Music * v, Liste l);
+
+
+// affiche tous les éléments de la liste l
+// Attention, cette fonction doit être indépendante du type des éléments de la liste
+// utiliser une fonction annexe affiche_Music *
+// Attention la liste peut être vide !
+// version itérative
+void afficheListe_i(Liste l);
+
+// version recursive
+void afficheListe_r(Liste l);
+
+
+// Détruit tous les éléments de la liste l
+// version itérative
+void detruire_i(Liste l);
+
+// version récursive
+void detruire_r(Liste l);
+
+// retourne la liste dans laquelle l'élément v a été ajouté en fin
+// version itérative
+Liste ajoutFin_i(Music * v, Liste l);
+
+// version recursive
+Liste ajoutFin_r(Music * v, Liste l);
+
+// Retourne un pointeur sur l'élément de la liste l contenant la valeur v ou NULL
+// version itérative
+Liste cherche_i(Music * v,Liste l);
+
+// version récursive
+Liste cherche_r(Music * v,Liste l);
+
+// Retourne la liste modifiée dans la laquelle le premier élément ayant la valeur v a été supprimé
+// ne fait rien si aucun élément possède cette valeur
+// version itérative
+Liste retirePremier_i(Music * v, Liste l);
+
+// version recursive
+Liste retirePremier_r(Music * v, Liste l);
+
+
+void afficheEnvers_r(Liste l);
+
+
+
+
+
+void afficheList2(Liste l){
+    if (! estVide(l)){
+		while ((*l).suiv!=NULL){
+			afficheMusic2((*l).val);
+			l = (*l).suiv;
+		}
+		printf("\n");
+	}
+}
+
+void afficheMusic2 (Music * m){
+    printf("%s\n", m->name);
+    printf("%s\n", m->artist);
+    printf("%s\n", m->album);
+    printf("%s\n", m->genre);
+    printf("%i\n", m->disc_Number);
+    printf("%i\n", m->track_Number);
+    printf("%i\n", m->year);
+
+}
+
+
+Music * initialiseMusic(char row[], FILE* f ){
+    char *string;
+    Music * newMusic = (Music *) malloc(sizeof(Music));
+    fgets(row, nbSongs, f);
+    string = strdup(row); //caution : strdup contains a malloc!
+    if( newMusic != NULL && string != NULL){
+        newMusic -> name = strsep(&string, ",");
+        newMusic -> artist = strsep(&string, ",");
+        newMusic -> album = strsep(&string, ",");
+        newMusic -> genre = strsep(&string, ",");
+        newMusic -> disc_Number = atoi(strsep(&string, ","));
+        newMusic -> track_Number = atoi(strsep(&string, ","));
+        newMusic -> year = atoi(strsep(&string, ","));  
+        free(string);            
+    }
+    return newMusic;//can potentially be NULL...
+}
+
+int main (void){   
+    
+    char fileName[] = "music.csv";
+    FILE* f;
+    f = fopen(fileName,"r");
+    
+    if(f==NULL) {
+        printf ("Code de l'erreur : %d\n", errno);
+        if (errno == ENOENT)
+            printf ("Le fichier n'existe pas !\n");
+        else{
+            printf ("Erreur inconnue\n");
+        }
+        return EXIT_FAILURE;
+    }
+
+    char row[nbSongs];
+    //first Music * of list
+    char *string;
+    Music * newMusic = (Music *) malloc(sizeof(Music));
+    fgets(row, nbSongs, f);
+    string = strdup(row); //caution : strdup contains a malloc!
+    if( newMusic != NULL && string != NULL){
+        newMusic -> name = strsep(&string, ",");
+        newMusic -> artist = strsep(&string, ",");
+        newMusic -> album = strsep(&string, ",");
+        newMusic -> genre = strsep(&string, ",");
+        newMusic -> disc_Number = atoi(strsep(&string, ","));
+        newMusic -> track_Number = atoi(strsep(&string, ","));
+        newMusic -> year = atoi(strsep(&string, ","));  
+        free(string);            
+    }
+
+    Liste listOfMusic = creer(newMusic);
+    printf("estVide(l) = %s\n",estVide(listOfMusic)?"TRUE":"FALSE");
+
+    //printf("%s\n",newMusic->name);
+    while ((feof(f) != true))
+    {
+        char *string;
+        Music * newMusic = (Music *) malloc(sizeof(Music));
+        fgets(row, nbSongs, f);
+        string = strdup(row); //caution : strdup contains a malloc!
+
+
+
+        if(newMusic != NULL && string != NULL){
+            newMusic -> name = strsep(&string, ",");
+            newMusic -> artist = strsep(&string, ",");
+            newMusic -> album = strsep(&string, ",");
+            newMusic -> genre = strsep(&string, ",");
+            newMusic -> disc_Number = atoi(strsep(&string, ","));
+            newMusic -> track_Number = atoi(strsep(&string, ","));
+            newMusic -> year = atoi(strsep(&string, ","));  
+            free(string);            
+        }
+        //printf("%s\n",newMusic->name);
+        listOfMusic = ajoutFin_i(newMusic, listOfMusic);
+       
+        
+    }
+
+    afficheList2(listOfMusic);
+
+    
+    fclose(f);
+
+    return EXIT_SUCCESS;
+}
+
+
+void afficheMusic (Music * e){
+    printf("%s", e->name);
+};
+
+void detruireMusic (Music * e){
+    free(e);
+};
+
+bool equalsMusic (Music * e1, Music * e2){
+    return strcmp((char *) e1, (char *) e2)==0;
+}
+
+
+
+// retourne vrai si l est vide et faux sinon
+bool estVide(Liste l) {
+	return l == NULL;
+}
+
+// créer une liste d'un seul élément contenant la valeur v
+Liste creer(Music * v){
+	Liste list = malloc(sizeof(Cellule));
+	if (list != NULL){
+		(*list).val = v;
+		(*list).suiv = NULL;
+	}
+	return list;
+}
+
+// ajoute l'élément v en tete de la liste l
+Liste ajoutTete(Music * v, Liste l) {
+	Liste list = creer(v);
+	(*list).suiv=l;
+	return list;
+}
+
+
+// affiche tous les éléments de la liste l
+// Attention, cette fonction doit être indépendante du type des éléments de la liste
+// utiliser une fonction annexe affiche_Music *
+// Attention la liste peut être vide !
+// version itérative
+void afficheListe_i(Liste l) {
+	if (! estVide(l)){
+		while ((*l).suiv!=NULL){
+			afficheMusic((*l).val);
+			l = (*l).suiv;
+		}
+		printf("\n");
+	}
+}
+
+// version recursive
+void afficheListe_r(Liste l) {
+	if (! estVide(l)){
+		afficheMusic(l->val);
+		afficheListe_r(l->suiv);
+	}
+	else
+	{
+		printf("/n");
+	}
+	
+}
+
+// Détruit tous les éléments de la liste l
+// version itérative
+void detruire_i(Liste l) {
+	Liste suivant, courant = l;
+
+	while(!estVide(courant)){
+		suivant = courant->suiv;
+		detruireMusic(courant->val);
+		free(courant);
+		courant = suivant;
+	}
+}
+
+// version récursive
+void detruire_r(Liste l) {
+	if(!estVide(l)){
+		detruire_r(l->suiv);
+		detruireMusic(l->val);
+		free(l);
+	}
+}
+
+// retourne la liste dans laquelle l'élément v a été ajouté en fin
+// version itérative
+Liste ajoutFin_i(Music * v, Liste l) {
+	Liste elem = creer(v);
+	Liste p = l;
+
+	if(estVide(p)){
+		return elem;
+	}
+
+	while (!estVide(p->suiv))
+		p=p->suiv;		
+	p->suiv = elem;
+	
+	return l;
+}
+
+// version recursive
+Liste ajoutFin_r(Music * v, Liste l) {
+	if(estVide(l)){
+		return creer(v);
+	}
+	else{
+		l->suiv = ajoutFin_r(v,l->suiv);
+	}
+	return l;	
+}
+
+
+// Retourne un pointeur sur l'élément de la liste l contenant la valeur v ou NULL
+// version itérative
+Liste cherche_i(Music * v,Liste l) {
+	Liste p = l;
+
+	while (!estVide(p) && (!equalsMusic(p->val, v))){
+		p = p-> suiv;
+	}
+	return p;
+}
+
+// version récursive
+Liste cherche_r(Music * v,Liste l) {
+	if(estVide(l) || equalsMusic(v, l->val)){
+		return l;
+	}	
+	else{
+		return cherche_r(v, l->suiv);
+	}
+}
+
+// Retourne la liste modifiée dans la laquelle le premier élément ayant la valeur v a été supprimé
+// ne fait rien si aucun élément possède cette valeur
+// version itérative
+Liste retirePremier_i(Music * v, Liste l) {
+	Liste precedent, p;
+
+	if(estVide(l)){
+		return l;
+	}
+
+	if(equalsMusic(l->val, v)){
+		p = l->suiv;
+		l -> suiv = NULL;
+		detruire_r(l);
+		return p;
+	}
+
+	precedent = l;
+	p = l->suiv;
+	while(!estVide(p) &&(!equalsMusic(p->val, v))){
+		precedent = p;
+		p = p->suiv;
+	}
+
+	if(!estVide(p)){
+		//on a trouvé v
+		precedent -> suiv = p-> suiv;
+		p-> suiv = NULL;
+		detruire_r(p);
+	}
+
+	return l;
+}
+
+
+// version recursive
+Liste retirePremier_r(Music * v, Liste l) {
+	Liste p = l;
+	if(estVide(l)){
+		return l;
+	}
+
+	if(equalsMusic(l->val, v)){
+		p = l->suiv;
+		l -> suiv = NULL;
+		detruire_r(l);
+		return p;
+	}
+
+	l->suiv = retirePremier_r(v, l->suiv);
+	return l;
+}
+
+
+void afficheEnvers_r(Liste l) {
+	if(!estVide(l)){
+		if(!estVide(l->suiv)){
+			afficheEnvers_r(l->suiv);
+		}
+		else{
+			afficheMusic(l->val);
+			printf(" ");
+		}
+	}
+}
